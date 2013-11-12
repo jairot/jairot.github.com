@@ -206,7 +206,7 @@ COMPILERS = {
 # plugin (`nikola install_plugin ping`).
 # To do manual deployment, set it to []
 DEPLOY_COMMANDS = ["git checkout master",
-                                     "git read-tree writing:output",
+                                     "git read-tree writing:jairot/output",
                                      "git commit -m 'deploy'",
                                      "git push",
                                      "git reset --hard",
