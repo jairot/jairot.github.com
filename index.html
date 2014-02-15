@@ -60,14 +60,6 @@
 <p>El mundillo de las wikis es bastante <a class="reference external" href="http://en.wikipedia.org/wiki/Comparison_of_wiki_software">amplio</a>, pero es este post voy a detallar los pasos para deployar de una manera bastante "Quick-and-dirty" una instancia de <a class="reference external" href="http://moinmo.in/">MoinMoin</a>,  usando Nginx, Supervisor y el servidor Standalone que MoinMoin trae incorporado. Mi intención inicial era usar gunicorn pero no encontre una manera simple de hacerlo (Si alguien sabe como que avise!).</p>
 <div class="section" id="instalando-y-configurando-moinmoin">
 <h2>Instalando y configurando MoinMoin</h2>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">&lt;string&gt;</tt>, line 6)</p>
-<p>Title underline too short.</p>
-<pre class="literal-block">
-Instalando y configurando MoinMoin
-----------------------
-</pre>
-</div>
 <p>Como MoinMoin esta hecho en python vamos a asegurarnos que tenemos instaladas todas las herramientas de entorno necesarias para trabajar</p>
 <pre class="literal-block">
 $ sudo apt-get install python-pip python-virtualenv supervisor nginx
@@ -92,23 +84,31 @@ moin --config-dir=setup/config server standalone
 </pre>
 <p>Abrimos un browser, tecleamos localhost:8080 en la barra del navegador y nos encontraremos con la pagina de configuración de MoinMoin. Seguimos los pasos que nos indica y ya casi estamos.</p>
 <p>El próximo paso es hacer un script para que Supervisor ejecute, para esto escribimos lo siguiente en un archivo llamado start.sh</p>
-<dl class="docutils"><dt>::</dt>
-<dd><p class="first">#!/bin/bash</p>
-<p>NAME="wiki" # Name of the application
+<pre class="literal-block">
+#!/bin/bash
+
+NAME="wiki" # Name of the application
 DIR=/home/serveruser/miwiki/ #project directory
 USER=serveruser  #the user to run as
-GROUP=serveruser</p>
-<p>echo "Starting $NAME"</p>
-<p># Activate the virtual environment
+GROUP=serveruser
+
+
+echo "Starting $NAME"
+
+# Activate the virtual environment
 cd $DIR
 source bin/activate
 #export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
-export PYTHONPATH=$DIR:$PYTHONPATH</p>
-<p class="last"># Create the run directory if it doesn't exist
+export PYTHONPATH=$DIR:$PYTHONPATH
+
+# Create the run directory if it doesn't exist
 # Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
-moin --config-dir=setup/config server standalone --port=4002</p>
-</dd>
-</dl><p>Para confirmar que todo esta bien, corremos start.sh y comprobamos que MoinMoin funciona (ahora en el puerto 4002).</p>
+moin --config-dir=setup/config server standalone --port=4002
+</pre>
+<p>Para confirmar que todo esta bien, corremos start.sh y comprobamos que MoinMoin funciona (ahora en el puerto 4002).</p>
+</div>
+<div class="section" id="supervisor-nginx">
+<h2>Supervisor + Nginx</h2>
 <p>Ahora resta indicarle a Supervisor que se acuerde de mantener levantado el servidor de nuestra wiki, creamos un archivo en /etc/supervisor/conf.d/wiki.conf</p>
 <pre class="literal-block">
 [program:wiki]
@@ -118,49 +118,42 @@ stdout_logfile = /home/serveruser/miwiki/log.log ;
 redirect_stderr = true ; Save stderr in the same log
 </pre>
 <p>Guardamos los cambios y corremos los comandos necesarios para que Supervisor levante el servidor de la wiki</p>
-<dl class="docutils"><dt>::</dt>
-<dd>$ sudo supervisorctl reread all
-$ sudo supervisorctl restart all</dd>
-</dl><p>Ya estamos casi listos! Solo falta un ultimo detalle, configurar nginx para que sirva MoinMoin, para esto creamos un archivo en /etc/nginx/sites-available/wiki.confcon los siguiente datos</p>
-<dl class="docutils"><dt>::</dt>
-<dd><p class="first">server {</p>
-<blockquote class="last">
-<blockquote>
-<p>listen 80;
-server_name wiki.mydomain.com;</p>
-<p>client_max_body_size 4G;</p>
-<p>access_log /home/serveruser/miwiki/nginx-access.log;
-error_log /home/serveruser/miwiki/nginx-error.log;</p>
-<dl class="docutils"><dt>location / {</dt>
-<dd><blockquote class="first">
-<p>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-proxy_set_header Host $http_host;
-proxy_redirect off;</p>
-<dl class="docutils"><dt>if (!-f $request_filename) {</dt>
-<dd><blockquote class="first">
-proxy_pass <a class="reference external" href="http://127.0.0.1:4002">http://127.0.0.1:4002</a>;
-break;</blockquote>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">&lt;string&gt;</tt>, line 102)</p>
-Block quote ends without a blank line; unexpected unindent.</div>
-<p class="last">}</p>
-</dd>
-</dl></blockquote>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">&lt;string&gt;</tt>, line 103)</p>
-Block quote ends without a blank line; unexpected unindent.</div>
-<p class="last">}</p>
-</dd>
-</dl></blockquote>
-<p>}</p>
-</blockquote>
-</dd>
-</dl><p>(Nota: Es posible que este archivo de configuración no sea de lo mejor, se muy poco de nginx y seguro hay muchas cosas para mejorarle, pero asi funciona)</p>
+<pre class="literal-block">
+$ sudo supervisorctl reread all
+$ sudo supervisorctl restart all
+</pre>
+<p>Ya estamos casi listos! Solo falta un ultimo detalle, configurar nginx para que sirva MoinMoin, para esto creamos un archivo en /etc/nginx/sites-available/wiki.confcon los siguiente datos</p>
+<pre class="literal-block">
+server {
+
+    listen 80;
+    server_name wiki.mydomain.com;
+
+    client_max_body_size 4G;
+
+    access_log /home/serveruser/miwiki/nginx-access.log;
+    error_log /home/serveruser/miwiki/nginx-error.log;
+
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+
+        if (!-f $request_filename) {
+            proxy_pass http://127.0.0.1:4002;
+            break;
+          }
+     }
+
+  }
+</pre>
+<p>(Nota: Es posible que este archivo de configuración no sea de lo mejor, se muy poco de nginx y seguro hay muchas cosas para mejorarle, pero asi funciona)</p>
 <p>Para terminar habilitamos el sitio creando un enlace simbólico en sites-enable y reiniciamos Nginx</p>
-<dl class="docutils"><dt>::</dt>
-<dd>$ sudo ln /etc/nginx/sites-available/wiki.conf /etc/nginx/sites-enable/wiki.conf
-$ sudo service nginx restart</dd>
-</dl><p>Listo el pollo! Ahora deberíamos ver la wiki en wiki.mydomain.com</p>
+<pre class="literal-block">
+$ sudo ln /etc/nginx/sites-available/wiki.conf /etc/nginx/sites-enable/wiki.conf
+$ sudo service nginx restart
+</pre>
+<p>Listo el pollo! Ahora deberíamos ver la wiki en wiki.mydomain.com</p>
 <p>Fácil no? Estoy seguro que muchos de ustedes tienen optimizaciones y/o correcciones para esto! Si es así les agradecería que me las envíen a cualquiera de los medios de contacto que están por ahí!</p>
 <p>Saludos, J</p>
 </div>

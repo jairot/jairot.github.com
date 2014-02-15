@@ -1,16 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Mi ñoño-Blog</title><link>http://jairot.github.com/</link><description>Rejunte de pensamientos y guías tecnicas personales.</description><atom:link href="http://jairot.github.com/rss.xml" type="application/rss+xml" rel="self"></atom:link><language>es</language><lastBuildDate>Fri, 14 Feb 2014 21:12:41 GMT</lastBuildDate><generator>nikola</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>MoinMoin + Supervisor + Nginx (O como deployar tu propia wiki)</title><link>http://jairot.github.com/posts/moinmoin-nginx-deployando-desde-las-trincheras.html</link><description>&lt;p&gt;Las Wikis son como las Tablets, todo el mundo quiere una pero nadie sabe bien para que sirven. Por esta misma razon es que las probabilidades de que en algun momento te toque deployar una wiki son bastante altas.&lt;/p&gt;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Mi ñoño-Blog</title><link>http://jairot.github.com/</link><description>Rejunte de pensamientos y guías tecnicas personales.</description><atom:link href="http://jairot.github.com/rss.xml" type="application/rss+xml" rel="self"></atom:link><language>es</language><lastBuildDate>Fri, 14 Feb 2014 21:15:44 GMT</lastBuildDate><generator>nikola</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>MoinMoin + Supervisor + Nginx (O como deployar tu propia wiki)</title><link>http://jairot.github.com/posts/moinmoin-nginx-deployando-desde-las-trincheras.html</link><description>&lt;p&gt;Las Wikis son como las Tablets, todo el mundo quiere una pero nadie sabe bien para que sirven. Por esta misma razon es que las probabilidades de que en algun momento te toque deployar una wiki son bastante altas.&lt;/p&gt;
 &lt;p&gt;El mundillo de las wikis es bastante &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Comparison_of_wiki_software"&gt;amplio&lt;/a&gt;, pero es este post voy a detallar los pasos para deployar de una manera bastante "Quick-and-dirty" una instancia de &lt;a class="reference external" href="http://moinmo.in/"&gt;MoinMoin&lt;/a&gt;,  usando Nginx, Supervisor y el servidor Standalone que MoinMoin trae incorporado. Mi intención inicial era usar gunicorn pero no encontre una manera simple de hacerlo (Si alguien sabe como que avise!).&lt;/p&gt;
 &lt;div class="section" id="instalando-y-configurando-moinmoin"&gt;
 &lt;h2&gt;Instalando y configurando MoinMoin&lt;/h2&gt;
-&lt;div class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: WARNING/2 (&lt;tt class="docutils"&gt;&amp;lt;string&amp;gt;&lt;/tt&gt;, line 6)&lt;/p&gt;
-&lt;p&gt;Title underline too short.&lt;/p&gt;
-&lt;pre class="literal-block"&gt;
-Instalando y configurando MoinMoin
-----------------------
-&lt;/pre&gt;
-&lt;/div&gt;
 &lt;p&gt;Como MoinMoin esta hecho en python vamos a asegurarnos que tenemos instaladas todas las herramientas de entorno necesarias para trabajar&lt;/p&gt;
 &lt;pre class="literal-block"&gt;
 $ sudo apt-get install python-pip python-virtualenv supervisor nginx
@@ -35,23 +27,31 @@ moin --config-dir=setup/config server standalone
 &lt;/pre&gt;
 &lt;p&gt;Abrimos un browser, tecleamos localhost:8080 en la barra del navegador y nos encontraremos con la pagina de configuración de MoinMoin. Seguimos los pasos que nos indica y ya casi estamos.&lt;/p&gt;
 &lt;p&gt;El próximo paso es hacer un script para que Supervisor ejecute, para esto escribimos lo siguiente en un archivo llamado start.sh&lt;/p&gt;
-&lt;dl class="docutils"&gt;&lt;dt&gt;::&lt;/dt&gt;
-&lt;dd&gt;&lt;p class="first"&gt;#!/bin/bash&lt;/p&gt;
-&lt;p&gt;NAME="wiki" # Name of the application
+&lt;pre class="literal-block"&gt;
+#!/bin/bash
+
+NAME="wiki" # Name of the application
 DIR=/home/serveruser/miwiki/ #project directory
 USER=serveruser  #the user to run as
-GROUP=serveruser&lt;/p&gt;
-&lt;p&gt;echo "Starting $NAME"&lt;/p&gt;
-&lt;p&gt;# Activate the virtual environment
+GROUP=serveruser
+
+
+echo "Starting $NAME"
+
+# Activate the virtual environment
 cd $DIR
 source bin/activate
 #export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
-export PYTHONPATH=$DIR:$PYTHONPATH&lt;/p&gt;
-&lt;p class="last"&gt;# Create the run directory if it doesn't exist
+export PYTHONPATH=$DIR:$PYTHONPATH
+
+# Create the run directory if it doesn't exist
 # Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
-moin --config-dir=setup/config server standalone --port=4002&lt;/p&gt;
-&lt;/dd&gt;
-&lt;/dl&gt;&lt;p&gt;Para confirmar que todo esta bien, corremos start.sh y comprobamos que MoinMoin funciona (ahora en el puerto 4002).&lt;/p&gt;
+moin --config-dir=setup/config server standalone --port=4002
+&lt;/pre&gt;
+&lt;p&gt;Para confirmar que todo esta bien, corremos start.sh y comprobamos que MoinMoin funciona (ahora en el puerto 4002).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="supervisor-nginx"&gt;
+&lt;h2&gt;Supervisor + Nginx&lt;/h2&gt;
 &lt;p&gt;Ahora resta indicarle a Supervisor que se acuerde de mantener levantado el servidor de nuestra wiki, creamos un archivo en /etc/supervisor/conf.d/wiki.conf&lt;/p&gt;
 &lt;pre class="literal-block"&gt;
 [program:wiki]
@@ -61,49 +61,42 @@ stdout_logfile = /home/serveruser/miwiki/log.log ;
 redirect_stderr = true ; Save stderr in the same log
 &lt;/pre&gt;
 &lt;p&gt;Guardamos los cambios y corremos los comandos necesarios para que Supervisor levante el servidor de la wiki&lt;/p&gt;
-&lt;dl class="docutils"&gt;&lt;dt&gt;::&lt;/dt&gt;
-&lt;dd&gt;$ sudo supervisorctl reread all
-$ sudo supervisorctl restart all&lt;/dd&gt;
-&lt;/dl&gt;&lt;p&gt;Ya estamos casi listos! Solo falta un ultimo detalle, configurar nginx para que sirva MoinMoin, para esto creamos un archivo en /etc/nginx/sites-available/wiki.confcon los siguiente datos&lt;/p&gt;
-&lt;dl class="docutils"&gt;&lt;dt&gt;::&lt;/dt&gt;
-&lt;dd&gt;&lt;p class="first"&gt;server {&lt;/p&gt;
-&lt;blockquote class="last"&gt;
-&lt;blockquote&gt;
-&lt;p&gt;listen 80;
-server_name wiki.mydomain.com;&lt;/p&gt;
-&lt;p&gt;client_max_body_size 4G;&lt;/p&gt;
-&lt;p&gt;access_log /home/serveruser/miwiki/nginx-access.log;
-error_log /home/serveruser/miwiki/nginx-error.log;&lt;/p&gt;
-&lt;dl class="docutils"&gt;&lt;dt&gt;location / {&lt;/dt&gt;
-&lt;dd&gt;&lt;blockquote class="first"&gt;
-&lt;p&gt;proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-proxy_set_header Host $http_host;
-proxy_redirect off;&lt;/p&gt;
-&lt;dl class="docutils"&gt;&lt;dt&gt;if (!-f $request_filename) {&lt;/dt&gt;
-&lt;dd&gt;&lt;blockquote class="first"&gt;
-proxy_pass &lt;a class="reference external" href="http://127.0.0.1:4002"&gt;http://127.0.0.1:4002&lt;/a&gt;;
-break;&lt;/blockquote&gt;
-&lt;div class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: WARNING/2 (&lt;tt class="docutils"&gt;&amp;lt;string&amp;gt;&lt;/tt&gt;, line 102)&lt;/p&gt;
-Block quote ends without a blank line; unexpected unindent.&lt;/div&gt;
-&lt;p class="last"&gt;}&lt;/p&gt;
-&lt;/dd&gt;
-&lt;/dl&gt;&lt;/blockquote&gt;
-&lt;div class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: WARNING/2 (&lt;tt class="docutils"&gt;&amp;lt;string&amp;gt;&lt;/tt&gt;, line 103)&lt;/p&gt;
-Block quote ends without a blank line; unexpected unindent.&lt;/div&gt;
-&lt;p class="last"&gt;}&lt;/p&gt;
-&lt;/dd&gt;
-&lt;/dl&gt;&lt;/blockquote&gt;
-&lt;p&gt;}&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;/dd&gt;
-&lt;/dl&gt;&lt;p&gt;(Nota: Es posible que este archivo de configuración no sea de lo mejor, se muy poco de nginx y seguro hay muchas cosas para mejorarle, pero asi funciona)&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+$ sudo supervisorctl reread all
+$ sudo supervisorctl restart all
+&lt;/pre&gt;
+&lt;p&gt;Ya estamos casi listos! Solo falta un ultimo detalle, configurar nginx para que sirva MoinMoin, para esto creamos un archivo en /etc/nginx/sites-available/wiki.confcon los siguiente datos&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+server {
+
+    listen 80;
+    server_name wiki.mydomain.com;
+
+    client_max_body_size 4G;
+
+    access_log /home/serveruser/miwiki/nginx-access.log;
+    error_log /home/serveruser/miwiki/nginx-error.log;
+
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+
+        if (!-f $request_filename) {
+            proxy_pass http://127.0.0.1:4002;
+            break;
+          }
+     }
+
+  }
+&lt;/pre&gt;
+&lt;p&gt;(Nota: Es posible que este archivo de configuración no sea de lo mejor, se muy poco de nginx y seguro hay muchas cosas para mejorarle, pero asi funciona)&lt;/p&gt;
 &lt;p&gt;Para terminar habilitamos el sitio creando un enlace simbólico en sites-enable y reiniciamos Nginx&lt;/p&gt;
-&lt;dl class="docutils"&gt;&lt;dt&gt;::&lt;/dt&gt;
-&lt;dd&gt;$ sudo ln /etc/nginx/sites-available/wiki.conf /etc/nginx/sites-enable/wiki.conf
-$ sudo service nginx restart&lt;/dd&gt;
-&lt;/dl&gt;&lt;p&gt;Listo el pollo! Ahora deberíamos ver la wiki en wiki.mydomain.com&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+$ sudo ln /etc/nginx/sites-available/wiki.conf /etc/nginx/sites-enable/wiki.conf
+$ sudo service nginx restart
+&lt;/pre&gt;
+&lt;p&gt;Listo el pollo! Ahora deberíamos ver la wiki en wiki.mydomain.com&lt;/p&gt;
 &lt;p&gt;Fácil no? Estoy seguro que muchos de ustedes tienen optimizaciones y/o correcciones para esto! Si es así les agradecería que me las envíen a cualquiera de los medios de contacto que están por ahí!&lt;/p&gt;
 &lt;p&gt;Saludos, J&lt;/p&gt;
 &lt;/div&gt;</description><guid>http://jairot.github.com/posts/moinmoin-nginx-deployando-desde-las-trincheras.html</guid><pubDate>Fri, 14 Feb 2014 15:52:16 GMT</pubDate></item><item><title>Hola Mundo!</title><link>http://jairot.github.com/posts/hola-mundo.html</link><description>&lt;p&gt;Gracias al tremendo laburo de la gente de &lt;a class="reference external" href="https://github.com/getnikola"&gt;Nikola&lt;/a&gt; por fin me hice un blog. Durante las proximas semanas voy a estar actualizandolo como para que quede digno.&lt;/p&gt;

@@ -10,7 +10,7 @@ Las Wikis son como las Tablets, todo el mundo quiere una pero nadie sabe bien pa
 El mundillo de las wikis es bastante `amplio <http://en.wikipedia.org/wiki/Comparison_of_wiki_software>`_, pero es este post voy a detallar los pasos para deployar de una manera bastante "Quick-and-dirty" una instancia de `MoinMoin  <http://moinmo.in/>`_,  usando Nginx, Supervisor y el servidor Standalone que MoinMoin trae incorporado. Mi intención inicial era usar gunicorn pero no encontre una manera simple de hacerlo (Si alguien sabe como que avise!).
 
 Instalando y configurando MoinMoin
-----------------------
+----------------------------------
 
 Como MoinMoin esta hecho en python vamos a asegurarnos que tenemos instaladas todas las herramientas de entorno necesarias para trabajar
 
@@ -47,6 +47,7 @@ Abrimos un browser, tecleamos localhost:8080 en la barra del navegador y nos enc
 El próximo paso es hacer un script para que Supervisor ejecute, para esto escribimos lo siguiente en un archivo llamado start.sh
 
 ::
+
     #!/bin/bash
      
     NAME="wiki" # Name of the application
@@ -69,6 +70,9 @@ El próximo paso es hacer un script para que Supervisor ejecute, para esto escri
 
 Para confirmar que todo esta bien, corremos start.sh y comprobamos que MoinMoin funciona (ahora en el puerto 4002).
 
+Supervisor + Nginx 
+-------------------
+
 Ahora resta indicarle a Supervisor que se acuerde de mantener levantado el servidor de nuestra wiki, creamos un archivo en /etc/supervisor/conf.d/wiki.conf
 
 ::
@@ -82,12 +86,14 @@ Ahora resta indicarle a Supervisor que se acuerde de mantener levantado el servi
 Guardamos los cambios y corremos los comandos necesarios para que Supervisor levante el servidor de la wiki
 
 ::
+
     $ sudo supervisorctl reread all
     $ sudo supervisorctl restart all
 
 Ya estamos casi listos! Solo falta un ultimo detalle, configurar nginx para que sirva MoinMoin, para esto creamos un archivo en /etc/nginx/sites-available/wiki.confcon los siguiente datos
 
 ::
+
     server {
 
         listen 80;
@@ -116,6 +122,7 @@ Ya estamos casi listos! Solo falta un ultimo detalle, configurar nginx para que 
 Para terminar habilitamos el sitio creando un enlace simbólico en sites-enable y reiniciamos Nginx
 
 ::
+
     $ sudo ln /etc/nginx/sites-available/wiki.conf /etc/nginx/sites-enable/wiki.conf
     $ sudo service nginx restart
 
