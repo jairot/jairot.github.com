@@ -7,7 +7,7 @@
 
 Las Wikis son como las Tablets, todo el mundo quiere una pero nadie sabe bien para que sirven. Por esta misma razon es que las probabilidades de que en algun momento te toque deployar una wiki son bastante altas. 
 
-El mundillo de las wikis es bastante `amplio <http://en.wikipedia.org/wiki/Comparison_of_wiki_software>`_, pero es este post voy a detallar los pasos para deployar de una manera bastante "Quick-and-dirty" una instancia de `MoinMoin  <http://moinmo.in/>`_,  usando Nginx, Supervisor y el servidor Standalone que MoinMoin trae incorporado. Mi intención inicial era usar guinicorn pero no encontre una manera simple de hacerlo (Si alguien sabe como que avise!).
+El mundillo de las wikis es bastante `amplio <http://en.wikipedia.org/wiki/Comparison_of_wiki_software>`_, pero es este post voy a detallar los pasos para deployar de una manera bastante "Quick-and-dirty" una instancia de `MoinMoin  <http://moinmo.in/>`_,  usando Nginx, Supervisor y el servidor Standalone que MoinMoin trae incorporado. Mi intención inicial era usar gunicorn pero no encontre una manera simple de hacerlo (Si alguien sabe como que avise!).
 
 Instalando y configurando MoinMoin
 ----------------------
