@@ -6,38 +6,46 @@
                         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
  <url>
   <loc>http://jairot.github.com/2013/index.html</loc>
-  <lastmod>2013-11-15</lastmod>
+  <lastmod>2014-02-14</lastmod>
+ </url>
+ <url>
+  <loc>http://jairot.github.com/2014/index.html</loc>
+  <lastmod>2014-02-14</lastmod>
  </url>
  <url>
   <loc>http://jairot.github.com/archive.html</loc>
-  <lastmod>2013-11-15</lastmod>
+  <lastmod>2014-02-14</lastmod>
  </url>
  <url>
   <loc>http://jairot.github.com/categories/index.html</loc>
-  <lastmod>2013-11-15</lastmod>
+  <lastmod>2014-02-14</lastmod>
  </url>
  <url>
   <loc>http://jairot.github.com/galleries/index.html</loc>
-  <lastmod>2013-11-15</lastmod>
+  <lastmod>2014-02-14</lastmod>
  </url>
  <url>
   <loc>http://jairot.github.com/galleries/rss.xml</loc>
-  <lastmod>2013-11-15</lastmod>
+  <lastmod>2014-02-14</lastmod>
  </url>
  <url>
   <loc>http://jairot.github.com/index.html</loc>
-  <lastmod>2013-11-15</lastmod>
+  <lastmod>2014-02-14</lastmod>
  </url>
  <url>
   <loc>http://jairot.github.com/listings/index.html</loc>
-  <lastmod>2013-11-15</lastmod>
+  <lastmod>2014-02-14</lastmod>
  </url>
  <url>
   <loc>http://jairot.github.com/posts/hola-mundo.html</loc>
-  <lastmod>2013-11-15</lastmod>
+  <lastmod>2014-02-14</lastmod>
+ </url>
+ <url>
+  <loc>http://jairot.github.com/posts/moinmoin-nginx-deployando-desde-las-trincheras.html</loc>
+  <lastmod>2014-02-14</lastmod>
  </url>
  <url>
   <loc>http://jairot.github.com/rss.xml</loc>
-  <lastmod>2013-11-12</lastmod>
+  <lastmod>2014-02-14</lastmod>
  </url>
 </urlset>
