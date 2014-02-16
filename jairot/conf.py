@@ -67,7 +67,7 @@ NAVIGATION_LINKS = {
             ('/archive.html', 'Archives', 'icon-folder-open-alt'),
             ('/categories/index.html', 'Tags', 'icon-tags'),
             ('/rss.xml', 'RSS', 'icon-rss'),
-            ('http://jairot.github.com/me', 'About me', 'icon-user'),
+            ('/stories/about-me.html', 'About me', 'icon-user'),
             ('https://twitter.com/jairotrad', 'My Twitter', 'icon-twitter'),
             ('https://github.com/jairot', 'My Github', 'icon-github'),
         )
@@ -528,19 +528,18 @@ CONTENT_FOOTER = CONTENT_FOOTER.format(email=BLOG_EMAIL,
 # <input type="text" id="tipue_search_input">
 # </span>"""
 #
-# BODY_END = """
-# <script type="text/javascript" src="/assets/js/tipuesearch_set.js"></script>
-# <script type="text/javascript" src="/assets/js/tipuesearch.js"></script>
-# <script type="text/javascript">
-# $(document).ready(function() {
-    # $('#tipue_search_input').tipuesearch({
-        # 'mode': 'json',
-        # 'contentLocation': '/assets/js/tipuesearch_content.json',
-        # 'showUrl': false
-    # });
-# });
-# </script>
-# """
+BODY_END = """
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+   ga('create', 'UA-43790625-2', 'jairot.github.io');
+    ga('send', 'pageview');
+
+</script>
+"""
 
 # EXTRA_HEAD_DATA = """
 # <link rel="stylesheet" type="text/css" href="/assets/css/tipuesearch.css">
